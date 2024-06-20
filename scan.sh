@@ -3,6 +3,7 @@ set -e
 
 PACKAGE=$1
 ARCHIVE=$2
+
 BUILDDIR=$(mktemp -d --suffix license-scan)
 NEWARCHIVE=$(mktemp -d --suffix license-scan)
 
@@ -17,3 +18,5 @@ cd "$BUILDDIR"
 cd "$NEWARCHIVE"
 tar axvf "$2"
 ~/.local/bin/scancode --license --license-references -n6 --strip-root --html /tmp/scan2.html --json-pp /tmp/scan2.json .
+
+python3 compare-scan-json.py
