@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import json
+import sys
 
 def load_json(filepath):
     """ Load a JSON file and return the 'files' list. """
@@ -27,23 +28,36 @@ def compare_files(file1, file2):
         if license_spdx is not None:
             licenses_set.add(license_spdx)
 
+    new_licenses = False
     # Paths in file2 not in file1 or with different detected licenses
     for path, license in file2_dict.items():
         if (path not in file1_dict or file1_dict[path] != license) and license is not None:
             print(f"New file: {path} - {license}")
+            new_licenses = True
+    if not new_licenses:
+        print("No new files")
 
+    removed_licenses = False
     # Paths in file1 not in file2
     for path, license in file1_dict.items():
         if path not in file2_dict and license is not None:
             print(f"Removed file: {path} - {license}")
+            removed_licenses = True
+    if not removed_licenses:
+        print("No removed files")
+        
 
     # Print unique licenses from the second file
-    print("\nUsed licenses in the new tarball:")
-    print(", ".join(licenses_set))
+    print("\nLicenses in the second tarball (ignoring differences):")
+    print("\n".join(licenses_set))
+
+if len(sys.argv) < 2:
+    print("Usage: compare-scan-json.py <file1_path> <file2_path>")
+    sys.exit(1)
 
 # File paths
-file_path1 = '/tmp/scan.json'
-file_path2 = '/tmp/scan2.json'
+file_path1 = sys.argv[1]
+file_path2 = sys.argv[2]
 
 # Load data from files
 file_data1 = load_json(file_path1)
